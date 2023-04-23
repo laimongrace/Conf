@@ -1,0 +1,36 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  name      String
+  createdAt DateTime  @default(now())
+  rooms     UserRoom[] // Добавьте эту строку для обратной связи
+}
+
+model Room {
+  id        Int       @id @default(autoincrement())
+  name      String
+  createdAt DateTime  @default(now())
+  userRooms UserRoom[] // Переименуйте поле и добавьте обратную связь
+}
+
+model UserRoom {
+  id     Int  @id @default(autoincrement())
+  userId Int
+  roomId Int
+  role   String
+
+  user   User @relation(fields: [userId], references: [id])
+  room   Room @relation(fields: [roomId], references: [id])
+
+  @@unique([userId, roomId])
+}
